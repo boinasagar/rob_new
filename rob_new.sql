@@ -22,7 +22,7 @@ CREATE TABLE IF NOT EXISTS `acos` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=229 DEFAULT CHARSET=latin1;
 
--- Dumping data for table rob_new.acos: ~79 rows (approximately)
+-- Dumping data for table rob_new.acos: ~95 rows (approximately)
 /*!40000 ALTER TABLE `acos` DISABLE KEYS */;
 INSERT INTO `acos` (`id`, `parent_id`, `model`, `foreign_key`, `alias`, `lft`, `rght`) VALUES
 	(1, NULL, NULL, NULL, 'controllers', 1, 190),
@@ -133,16 +133,22 @@ CREATE TABLE IF NOT EXISTS `aros` (
   `lft` int(10) DEFAULT NULL,
   `rght` int(10) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=latin1;
 
--- Dumping data for table rob_new.aros: ~5 rows (approximately)
+-- Dumping data for table rob_new.aros: ~11 rows (approximately)
 /*!40000 ALTER TABLE `aros` DISABLE KEYS */;
 INSERT INTO `aros` (`id`, `parent_id`, `model`, `foreign_key`, `alias`, `lft`, `rght`) VALUES
 	(2, NULL, 'Group', 1, 'Group', 3, 6),
-	(3, NULL, 'Group', 2, 'Group', 7, 10),
+	(3, NULL, 'Group', 2, 'Group', 7, 22),
 	(4, 2, 'User', 1, 'User', 4, 5),
 	(5, 3, 'User', 2, 'User', 8, 9),
-	(6, 2, 'User', 3, '', 11, 12);
+	(6, 2, 'User', 3, '', 23, 24),
+	(7, 3, 'User', 4, '', 10, 11),
+	(8, 3, 'User', 6, '', 12, 13),
+	(9, 3, 'User', 7, '', 14, 15),
+	(10, 3, 'User', 8, '', 16, 17),
+	(11, 3, 'User', 9, '', 18, 19),
+	(12, 3, 'User', 10, '', 20, 21);
 /*!40000 ALTER TABLE `aros` ENABLE KEYS */;
 
 
@@ -191,7 +197,7 @@ CREATE TABLE IF NOT EXISTS `bills` (
   CONSTRAINT `FK_bills_users_3` FOREIGN KEY (`updated_by`) REFERENCES `users` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=latin1;
 
--- Dumping data for table rob_new.bills: ~0 rows (approximately)
+-- Dumping data for table rob_new.bills: ~1 rows (approximately)
 /*!40000 ALTER TABLE `bills` DISABLE KEYS */;
 INSERT INTO `bills` (`id`, `bill_unique_id`, `bill_amount`, `status`, `bill_user`, `bill_image`, `comments`, `created_by`, `created_date`, `updated_by`, `updated_date`) VALUES
 	(1, NULL, 2345, 1, 2, 'data:image/gif;base64,R0lGODlhPQBEAPeoAJosM//AwO/AwHVYZ/z595kzAP/s7P+goOXMv8+fhw/v739/f+8PD98fH/8mJl+fn/9ZWb8/PzWlwv///6wWGbImAPgTEMImIN9gUFCEm/gDALULDN8PAD6atYdCTX9gUNKlj8wZAKUsAOzZz+UMAOsJAP/Z2ccMDA8PD/95eX5NWvsJCOVNQPtfX/8zM8+QePLl38MGBr8JCP+zs9myn/8GBqwpAP/GxgwJCPny78lzYLgjAJ8vAP9fX/+MjMUcAN8zM/9wcM8ZGcATEL+QePdZWf/29uc/P9cmJu9MTDImIN+/r7+/vz8/P8VNQGNugV8AAF9fX8swMNgTAFlDOICAgPNSUnNWSMQ5MBAQEJE3QPIGAM9AQMqGcG9vb6MhJsEdGM8vLx8fH98AANIWAMuQeL8fABkTEPPQ0OM5OSYdGFl5jo+Pj/+pqcsTE78wMFNGQLYmID4dGPvd3UBAQJmTkP+8vH9QUK+vr8ZWSHpzcJMmILdwcLOGcHRQUHxwcK9PT9DQ0O/v70w5MLypoG8wKOuwsP/g4P/Q0IcwKEswKMl8aJ9fX2xjdOtGRs/Pz+Dg4GImIP8gIH0sKEAwKKmTiKZ8aB/f39Wsl+LFt8dgUE9PT5x5aHBwcP+AgP+WltdgYMyZfyywz78AAAAAAAD///8AAP9mZv///wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACH5BAEAAKgALAAAAAA9AEQAAAj/AFEJHEiwoMGDCBMqXMiwocAbBww4nEhxoYkUpzJGrMixogkfGUNqlNixJEIDB0SqHGmyJSojM1bKZOmyop0gM3Oe2liTISKMOoPy7GnwY9CjIYcSRYm0aVKSLmE6nfq05QycVLPuhDrxBlCtYJUqNAq2bNWEBj6ZXRuyxZyDRtqwnXvkhACDV+euTeJm1Ki7A73qNWtFiF+/gA95Gly2CJLDhwEHMOUAAuOpLYDEgBxZ4GRTlC1fDnpkM+fOqD6DDj1aZpITp0dtGCDhr+fVuCu3zlg49ijaokTZTo27uG7Gjn2P+hI8+PDPERoUB318bWbfAJ5sUNFcuGRTYUqV/3ogfXp1rWlMc6awJjiAAd2fm4ogXjz56aypOoIde4OE5u/F9x199dlXnnGiHZWEYbGpsAEA3QXYnHwEFliKAgswgJ8LPeiUXGwedCAKABACCN+EA1pYIIYaFlcDhytd51sGAJbo3onOpajiihlO92KHGaUXGwWjUBChjSPiWJuOO/LYIm4v1tXfE6J4gCSJEZ7YgRYUNrkji9P55sF/ogxw5ZkSqIDaZBV6aSGYq/lGZplndkckZ98xoICbTcIJGQAZcNmdmUc210hs35nCyJ58fgmIKX5RQGOZowxaZwYA+JaoKQwswGijBV4C6SiTUmpphMspJx9unX4KaimjDv9aaXOEBteBqmuuxgEHoLX6Kqx+yXqqBANsgCtit4FWQAEkrNbpq7HSOmtwag5w57GrmlJBASEU18ADjUYb3ADTinIttsgSB1oJFfA63bduimuqKB1keqwUhoCSK374wbujvOSu4QG6UvxBRydcpKsav++Ca6G8A6Pr1x2kVMyHwsVxUALDq/krnrhPSOzXG1lUTIoffqGR7Goi2MAxbv6O2kEG56I7CSlRsEFKFVyovDJoIRTg7sugNRDGqCJzJgcKE0ywc0ELm6KBCCJo8DIPFeCWNGcyqNFE06ToAfV0HBRgxsvLThHn1oddQMrXj5DyAQgjEHSAJMWZwS3HPxT/QMbabI/iBCliMLEJKX2EEkomBAUCxRi42VDADxyTYDVogV+wSChqmKxEKCDAYFDFj4OmwbY7bDGdBhtrnTQYOigeChUmc1K3QTnAUfEgGFgAWt88hKA6aCRIXhxnQ1yg3BCayK44EWdkUQcBByEQChFXfCB776aQsG0BIlQgQgE8qO26X1h8cEUep8ngRBnOy74E9QgRgEAC8SvOfQkh7FDBDmS43PmGoIiKUUEGkMEC/PJHgxw0xH74yx/3XnaYRJgMB8obxQW6kL9QYEJ0FIFgByfIL7/IQAlvQwEpnAC7DtLNJCKUoO/w45c44GwCXiAFB/OXAATQryUxdN4LfFiwgjCNYg+kYMIEFkCKDs6PKAIJouyGWMS1FSKJOMRB/BoIxYJIUXFUxNwoIkEKPAgCBZSQHQ1A2EWDfDEUVLyADj5AChSIQW6gu10bE/JG2VnCZGfo4R4d0sdQoBAHhPjhIB94v/wRoRKQWGRHgrhGSQJxCS+0pCZbEhAAOw==', 'test bill2', 2, '2017-01-18 14:49:00', 2, '2017-01-18 14:49:00');
@@ -309,21 +315,55 @@ CREATE TABLE IF NOT EXISTS `users` (
   `username` varchar(255) NOT NULL,
   `email` varchar(250) NOT NULL,
   `password` char(40) NOT NULL,
-  `group_id` int(11) NOT NULL,
+  `group_id` int(11) NOT NULL DEFAULT '2',
   `status` int(11) NOT NULL DEFAULT '0',
   `created` datetime DEFAULT NULL,
   `modified` datetime DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `username` (`username`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=latin1;
 
--- Dumping data for table rob_new.users: ~3 rows (approximately)
+-- Dumping data for table rob_new.users: ~9 rows (approximately)
 /*!40000 ALTER TABLE `users` DISABLE KEYS */;
 INSERT INTO `users` (`id`, `name`, `username`, `email`, `password`, `group_id`, `status`, `created`, `modified`) VALUES
 	(1, 'Faruq Shaik', 'faruq@gmail.com', 'faruq@gmail.com', '2f513d0aefa2b4943892320890413111f92e1a2d', 1, 1, '2014-07-23 10:46:14', '2014-07-23 10:46:14'),
 	(2, 'shaik', 'faruq1', 'faruq1256@gmail.com', '2f513d0aefa2b4943892320890413111f92e1a2d', 2, 0, '2014-07-23 10:58:53', '2014-07-23 10:58:53'),
-	(3, '', 'shaik', 'shaik1256@gmail.com', 'f69a2881d349b34ae1518a04b646f3edb06bc4b8', 1, 0, '2017-01-11 19:19:14', '2017-01-11 19:19:14');
+	(3, '', 'shaik', 'shaik1256@gmail.com', 'f69a2881d349b34ae1518a04b646f3edb06bc4b8', 1, 0, '2017-01-11 19:19:14', '2017-01-11 19:19:14'),
+	(4, 'test test lname', '', 'test@test.com', '8d8d29dd4370af717ddb1752da2a3c31936c3e60', 2, 0, '2017-01-19 09:58:31', '2017-01-19 09:58:31'),
+	(6, 'test test lname', 'tester', 'test@test.com', '8d8d29dd4370af717ddb1752da2a3c31936c3e60', 2, 0, '2017-01-19 10:01:39', '2017-01-19 10:01:39'),
+	(7, 'test test lname', 'tester2', 'test@test.com', '8d8d29dd4370af717ddb1752da2a3c31936c3e60', 2, 0, '2017-01-19 10:02:55', '2017-01-19 10:02:55'),
+	(8, 'test test lname', 'tester3', 'test@test.com', '8d8d29dd4370af717ddb1752da2a3c31936c3e60', 2, 0, '2017-01-19 10:03:34', '2017-01-19 10:03:34'),
+	(9, 'test test lname', 'tester4', 'test@test.com', '8d8d29dd4370af717ddb1752da2a3c31936c3e60', 2, 0, '2017-01-19 10:04:04', '2017-01-19 10:04:04'),
+	(10, 'test fname test lname', 'tester5', 'test@test.com', '8d8d29dd4370af717ddb1752da2a3c31936c3e60', 2, 0, '2017-01-19 10:06:44', '2017-01-19 10:30:56');
 /*!40000 ALTER TABLE `users` ENABLE KEYS */;
+
+
+-- Dumping structure for table rob_new.user_details
+CREATE TABLE IF NOT EXISTS `user_details` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `user_id` int(11) NOT NULL,
+  `first_name` varchar(256) DEFAULT NULL,
+  `last_name` varchar(256) DEFAULT NULL,
+  `mobile` varchar(256) DEFAULT NULL,
+  `promo_code` varchar(256) DEFAULT NULL,
+  `dob` date DEFAULT NULL,
+  `address` text,
+  `profile_pic` text,
+  `ip_address` varchar(256) DEFAULT NULL,
+  `reffered_by` varchar(256) DEFAULT NULL,
+  `mobile_info` text,
+  `wallet_amount` double DEFAULT '0',
+  PRIMARY KEY (`id`),
+  KEY `FK__users` (`user_id`),
+  CONSTRAINT `FK__users` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=latin1;
+
+-- Dumping data for table rob_new.user_details: ~2 rows (approximately)
+/*!40000 ALTER TABLE `user_details` DISABLE KEYS */;
+INSERT INTO `user_details` (`id`, `user_id`, `first_name`, `last_name`, `mobile`, `promo_code`, `dob`, `address`, `profile_pic`, `ip_address`, `reffered_by`, `mobile_info`, `wallet_amount`) VALUES
+	(2, 9, 'test', 'test lname', '8239892333', 'promo12324', NULL, NULL, NULL, NULL, NULL, NULL, 0),
+	(3, 10, 'test fname', 'test lname', '8239892333', 'promo1234567890', NULL, NULL, NULL, NULL, NULL, NULL, 0);
+/*!40000 ALTER TABLE `user_details` ENABLE KEYS */;
 
 
 -- Dumping structure for table rob_new.widgets
