@@ -52,7 +52,7 @@ public function initDB() {
 	
 	public function add() {
 		$this->set('groups', $this->User->Group->find('list'));
-		if ($this->request->is('post')) { //print_r($this->request->data); exit;
+		if ($this->request->is('post')) { //print_r(json_encode($this->request->data)); exit;
 //            $this->User->create();
             if ($this->User->save($this->request->data)) {
                 $this->Session->setFlash(__('Your post has been saved.'));
