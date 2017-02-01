@@ -13,7 +13,7 @@ class PostsController extends AppController {
  *
  * @var array
  */
-	public $components = array('Paginator');
+	public $components = array('RequestHandler', 'Paginator', 'Auth', 'Acl');
 
 /**
  * index method

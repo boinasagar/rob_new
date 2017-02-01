@@ -13,7 +13,7 @@ class CategoriesController extends AppController {
  *
  * @var array
  */
-	public $components = array('RequestHandler', 'Paginator');
+	public $components = array('RequestHandler', 'Paginator', 'Auth', 'Acl');
 
 	public function beforeFilter() {
 		$this->Auth->allow('index');

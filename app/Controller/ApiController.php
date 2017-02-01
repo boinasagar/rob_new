@@ -25,7 +25,7 @@ var $uses = array('Category','User','Outlet', 'Bill', 'UserDetail');
 		parent::beforeFilter();
 		//$this->Security->validatePost = false;
 		//$this->layout = 'api_layout'; 
-		$this->Auth->allow(array('api_login', 'request_login', 'request_users'));
+		$this->Auth->allow(array('api_login', 'request_login', 'request_users', 'users_add'));
 		// $this->Security->unlockActions = array('api_login', 'request_login');
 		/*$hash = $this->Auth->password($_SERVER['HTTP_PASSWORD']);
 		$check = $this->User->find('first',
@@ -182,9 +182,9 @@ public function request_login(){
 					$User['UserDetail'][$user_key] = $user_val; 
 				}
 				
-				$User['User']['name'] = $User['UserDetail']['first_name']." ".$User['UserDetail']['last_name']; 
+				$User['User']['username'] = $User['User']['email'];
 			}
-						
+			
 			$this->User->create();			
 			if ($this->User->save($User['User'])) {
 				$id = $this->User->getLastInsertId();
@@ -194,7 +194,8 @@ public function request_login(){
 				$message = 'The user has been saved.';
 				$this->set(array(
 					'message' => $message,
-					'_serialize' => array('message')
+					'id' => $id,
+					'_serialize' => array('message', 'id')
 				));
 			} else {		
 				$message = 'The user could not be saved. Please, try again.';
