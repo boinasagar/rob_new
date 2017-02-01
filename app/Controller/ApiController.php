@@ -171,7 +171,7 @@ public function request_login(){
 		
 	}
 	
-	public function users_add() {
+	public function users_add() {		
 		if ($this->request->is('post')) {			
 			foreach($this->request->data['User'] as $user_key => $user_val) {
 				
@@ -186,11 +186,28 @@ public function request_login(){
 			}
 			
 			$this->User->create();			
-			if ($this->User->save($User['User'])) {
+			if ($this->User->save($User['User'])) {				
+				
+				//otp generation
+				$string = '0123456789';
+			    $string_shuffled = str_shuffle($string);
+			    $otp_pwd = substr($string_shuffled, 1, 6);
+				$opt_msg = $otp_pwd." is the One time password (OTP) for your registration at ROB.";
+				$mobile = $User['UserDetail']['mobile'];
+				$otp_url = "http://103.16.101.52:8080/bulksms/bulksms?username=ints-intech&password=123456&type=0&dlr=1&destination=$mobile&source=WEDDZO&message=$opt_msg";
+								
+				App::uses('HttpSocket', 'Network/Http');
+				$HttpSocket = new HttpSocket();
+				// string query
+				$results = $HttpSocket->get($otp_url);
+				//end -otp sent
+				
 				$id = $this->User->getLastInsertId();
-				$User['UserDetail']['user_id'] = $id;				
+				$User['UserDetail']['user_id'] = $id;
+				$User['UserDetail']['otp'] = $otp_pwd;
 				$this->UserDetail->create();	
 				$this->UserDetail->save($User['UserDetail']);
+				
 				$message = 'The user has been saved.';
 				$this->set(array(
 					'message' => $message,
@@ -211,6 +228,52 @@ public function request_login(){
 					'_serialize' => array('message')
 				));
 		}
+	}
+	
+	public function verify_otp() {
+		if ($this->request->is('post')) {
+			if (!$this->request->data['User']['id'] || !$this->request->data['User']['otp']) {
+				$message = 'Invalid User.';
+				$this->set(array(
+					'message' => $message,
+					'_serialize' => array('message')
+				));
+			}
+			if($this->request->data['User']['id'] && $this->request->data['User']['otp']) {
+					
+					$userdetails_id = $this->UserDetail->find('first', array(
+					  'conditions'=>array('user_id'=>$this->request->data['User']['id'], 'otp'=>$this->request->data['User']['otp']),
+					  'fields'=>array('id')
+					));
+					//print_r($userdetails_id);
+					if($userdetails_id){
+						//$User['UserDetail']['id'] = $userdetails_id['UserDetail']['id'];
+						$User['User']['id'] = $this->request->data['User']['id']; 
+						$User['User']['status'] = '1';
+						//print_r($User);
+						$this->User->save($User['User']);
+						//$this->UserDetail->save($User['UserDetail']);
+						$message = 'The user has been verified successfully.';
+						$this->set(array(
+							'message' => $message,
+							'_serialize' => array('message')
+						));
+					}else{
+						$message = 'Invalid OTP.';
+						$this->set(array(
+							'message' => $message,
+							'_serialize' => array('message')
+						));	
+					}					
+			
+			}else{
+				$message = 'Invalid Request.';
+				$this->set(array(
+					'message' => $message,
+					'_serialize' => array('message')
+				));
+			}
+	}
 	}
 	
 	
