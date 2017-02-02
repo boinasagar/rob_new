@@ -99,11 +99,11 @@ public function request_login(){
 		$this -> render('/Api/request_response');
 	}
 	
-	public function api_login() { pr($this->request->data);
+	public function api_login() {
 		if ($this->Auth->login()) {
 			$user = $this->Auth->user();
 			//echo $this->Session->read('Auth.User.User.email');
-			print $token = JWT::encode($user, Configure::read('Security.salt'));
+			$token = JWT::encode($user, Configure::read('Security.salt'));
 			$this->Session->write('_token', $token);
 			//$user['token'] = $token;
 			$this->set('user', $user);
@@ -180,12 +180,11 @@ public function request_login(){
 				}
 				else{
 					$User['UserDetail'][$user_key] = $user_val; 
-				}				
+				}
+				
 				
 			}
-			
 			$User['User']['username'] = $User['User']['email'];
-			
 			$chk_user = $this->User->find('first', array(
 					  'conditions'=>array('email'=>$User['User']['email']),
 					  'fields'=>array('id')
@@ -196,46 +195,54 @@ public function request_login(){
 				$this->set(array(
 					'message' => $message,
 					'_serialize' => array('message')
-				));				
-			}else{
-			
-				$this->User->create();			
-				if ($this->User->save($User['User'])) {			
-					
-					//otp generation
-					$string = '0123456789';
-					$string_shuffled = str_shuffle($string);
-					$otp_pwd = substr($string_shuffled, 1, 6);
-					$opt_msg = $otp_pwd." is the One time password (OTP) for your registration at ROB.";
-					$mobile = $User['UserDetail']['mobile'];
-					$otp_url = "http://103.16.101.52:8080/bulksms/bulksms?username=ints-intech&password=123456&type=0&dlr=1&destination=$mobile&source=WEDDZO&message=$opt_msg";
-									
-					App::uses('HttpSocket', 'Network/Http');
-					$HttpSocket = new HttpSocket();
-					// string query
-					$results = $HttpSocket->get($otp_url);
-					//end -otp sent
-					
-					$id = $this->User->getLastInsertId();
-					$User['UserDetail']['user_id'] = $id;
-					$User['UserDetail']['otp'] = $otp_pwd;
-					$this->UserDetail->create();	
-					$this->UserDetail->save($User['UserDetail']);
-					
-					$message = 'The user has been saved.';
-					$this->set(array(
-						'message' => $message,
-						'id' => $id,
-						'_serialize' => array('message', 'id')
-					));
-				} else {		
-					$message = 'The user could not be saved. Please, try again.';
-					$this->set(array(
-						'message' => $message,
-						'_serialize' => array('message')
-					));
-				}
-			}			
+				));	
+				
+			$this->User->create();			
+			if ($this->User->save($User['User'])) {				
+				
+				//otp generation
+				$string = '0123456789';
+			    $string_shuffled = str_shuffle($string);
+			    $otp_pwd = substr($string_shuffled, 1, 6);
+				$opt_msg = $otp_pwd." is the One time password (OTP) for your registration at ROB.";
+				$mobile = $User['UserDetail']['mobile'];
+				$otp_url = "http://103.16.101.52:8080/bulksms/bulksms?username=ints-intech&password=123456&type=0&dlr=1&destination=$mobile&source=WEDDZO&message=$opt_msg";				file_get_contents($otp_url);
+				 /*$ch = curl_init();
+				 curl_setopt($ch, CURLOPT_URL, $otp_url);
+				 curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+				 $output = curl_exec($ch);
+				curl_close($ch);*/
+
+				
+				
+				/*
+				$HttpSocket = new HttpSocket(array(
+				   'host' => 'cakephp.org',
+				   'timeout' => 20
+				));
+				// string query
+				$results = $HttpSocket->get($otp_url);*/
+				//end -otp sent
+				
+				$id = $this->User->getLastInsertId();
+				$User['UserDetail']['user_id'] = $id;
+				$User['UserDetail']['otp'] = $otp_pwd;
+				$this->UserDetail->create();	
+				$this->UserDetail->save($User['UserDetail']);
+				
+				$message = 'The user has been saved.';
+				$this->set(array(
+					'message' => $message,
+					'id' => $id,
+					'_serialize' => array('message', 'id')
+				));
+			} else {		
+				$message = 'The user could not be saved. Please, try again.';
+				$this->set(array(
+					'message' => $message,
+					'_serialize' => array('message')
+				));
+			}		
 		}else{
 				$message = 'Invalid Request.';
 				$this->set(array(
@@ -243,7 +250,6 @@ public function request_login(){
 					'_serialize' => array('message')
 				));
 		}
-		
 	}
 	
 	public function verify_otp() {
