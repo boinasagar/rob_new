@@ -180,47 +180,62 @@ public function request_login(){
 				}
 				else{
 					$User['UserDetail'][$user_key] = $user_val; 
-				}
+				}				
 				
-				$User['User']['username'] = $User['User']['email'];
 			}
 			
-			$this->User->create();			
-			if ($this->User->save($User['User'])) {				
-				
-				//otp generation
-				$string = '0123456789';
-			    $string_shuffled = str_shuffle($string);
-			    $otp_pwd = substr($string_shuffled, 1, 6);
-				$opt_msg = $otp_pwd." is the One time password (OTP) for your registration at ROB.";
-				$mobile = $User['UserDetail']['mobile'];
-				$otp_url = "http://103.16.101.52:8080/bulksms/bulksms?username=ints-intech&password=123456&type=0&dlr=1&destination=$mobile&source=WEDDZO&message=$opt_msg";
-								
-				App::uses('HttpSocket', 'Network/Http');
-				$HttpSocket = new HttpSocket();
-				// string query
-				$results = $HttpSocket->get($otp_url);
-				//end -otp sent
-				
-				$id = $this->User->getLastInsertId();
-				$User['UserDetail']['user_id'] = $id;
-				$User['UserDetail']['otp'] = $otp_pwd;
-				$this->UserDetail->create();	
-				$this->UserDetail->save($User['UserDetail']);
-				
-				$message = 'The user has been saved.';
-				$this->set(array(
-					'message' => $message,
-					'id' => $id,
-					'_serialize' => array('message', 'id')
-				));
-			} else {		
-				$message = 'The user could not be saved. Please, try again.';
+			$User['User']['username'] = $User['User']['email'];
+			
+			$chk_user = $this->User->find('first', array(
+					  'conditions'=>array('email'=>$User['User']['email']),
+					  'fields'=>array('id')
+					));
+					
+			if($chk_user){
+				$message = 'Email already exists.';
 				$this->set(array(
 					'message' => $message,
 					'_serialize' => array('message')
-				));
-			}		
+				));				
+			}else{
+			
+				$this->User->create();			
+				if ($this->User->save($User['User'])) {			
+					
+					//otp generation
+					$string = '0123456789';
+					$string_shuffled = str_shuffle($string);
+					$otp_pwd = substr($string_shuffled, 1, 6);
+					$opt_msg = $otp_pwd." is the One time password (OTP) for your registration at ROB.";
+					$mobile = $User['UserDetail']['mobile'];
+					$otp_url = "http://103.16.101.52:8080/bulksms/bulksms?username=ints-intech&password=123456&type=0&dlr=1&destination=$mobile&source=WEDDZO&message=$opt_msg";
+									
+					App::uses('HttpSocket', 'Network/Http');
+					$HttpSocket = new HttpSocket();
+					// string query
+					$results = $HttpSocket->get($otp_url);
+					//end -otp sent
+					
+					$id = $this->User->getLastInsertId();
+					$User['UserDetail']['user_id'] = $id;
+					$User['UserDetail']['otp'] = $otp_pwd;
+					$this->UserDetail->create();	
+					$this->UserDetail->save($User['UserDetail']);
+					
+					$message = 'The user has been saved.';
+					$this->set(array(
+						'message' => $message,
+						'id' => $id,
+						'_serialize' => array('message', 'id')
+					));
+				} else {		
+					$message = 'The user could not be saved. Please, try again.';
+					$this->set(array(
+						'message' => $message,
+						'_serialize' => array('message')
+					));
+				}
+			}			
 		}else{
 				$message = 'Invalid Request.';
 				$this->set(array(
@@ -228,6 +243,7 @@ public function request_login(){
 					'_serialize' => array('message')
 				));
 		}
+		
 	}
 	
 	public function verify_otp() {
