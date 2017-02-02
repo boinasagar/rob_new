@@ -184,6 +184,10 @@ public function request_login(){
 				
 			}
 			
+			if(isset($User['User']['password'])){
+				$User['User']['password'] = AuthComponent::password($User['User']['password']);
+			}
+			
 			$User['User']['username'] = $User['User']['email'];
 			
 			$chk_user = $this->User->find('first', array(
