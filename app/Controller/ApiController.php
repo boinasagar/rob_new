@@ -180,9 +180,7 @@ public function request_login(){
 				}
 				else{
 					$User['UserDetail'][$user_key] = $user_val; 
-				}
-				
-				
+				}				
 			}
 			$User['User']['username'] = $User['User']['email'];
 			$chk_user = $this->User->find('first', array(
