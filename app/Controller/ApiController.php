@@ -99,11 +99,11 @@ public function request_login(){
 		$this -> render('/Api/request_response');
 	}
 	
-	public function api_login() { pr($this->request->data);
+	public function api_login() {
 		if ($this->Auth->login()) {
 			$user = $this->Auth->user();
 			//echo $this->Session->read('Auth.User.User.email');
-			print $token = JWT::encode($user, Configure::read('Security.salt'));
+			$token = JWT::encode($user, Configure::read('Security.salt'));
 			$this->Session->write('_token', $token);
 			//$user['token'] = $token;
 			$this->set('user', $user);
@@ -181,15 +181,12 @@ public function request_login(){
 				else{
 					$User['UserDetail'][$user_key] = $user_val; 
 				}				
-				
 			}
-			
 			if(isset($User['User']['password'])){
 				$User['User']['password'] = AuthComponent::password($User['User']['password']);
 			}
 			
 			$User['User']['username'] = $User['User']['email'];
-			
 			$chk_user = $this->User->find('first', array(
 					  'conditions'=>array('email'=>$User['User']['email']),
 					  'fields'=>array('id')
@@ -232,14 +229,14 @@ public function request_login(){
 						'id' => $id,
 						'_serialize' => array('message', 'id')
 					));
-				} else {		
+				} else {
 					$message = 'The user could not be saved. Please, try again.';
 					$this->set(array(
 						'message' => $message,
 						'_serialize' => array('message')
 					));
 				}
-			}			
+			}
 		}else{
 				$message = 'Invalid Request.';
 				$this->set(array(
@@ -247,7 +244,6 @@ public function request_login(){
 					'_serialize' => array('message')
 				));
 		}
-		
 	}
 	
 	public function verify_otp() {
