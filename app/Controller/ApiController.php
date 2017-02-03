@@ -224,9 +224,12 @@ public function request_login(){
 					
 					
 					//start - promo code generation
-					$promo_string = 'abcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ!#*_-';
+					/*$promo_string = 'abcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ!#*_-';
 					$promo_string_shuffled = str_shuffle($promo_string);
-					$user_promo_code = substr($promo_string_shuffled, 1, 6);				
+					$user_promo_code = substr($promo_string_shuffled, 1, 6);*/
+					$promo_user_name = explode(' ',trim($User['User']['name']));
+					//echo $promo_user_name[0]; // will print Test
+					$user_promo_code = strtoupper($promo_user_name[0]."".$id);
 					//end - promo code generation
 					$PromoCode['PromoCode']['user_id'] = $id;
 					$PromoCode['PromoCode']['promo_code'] = $user_promo_code;
