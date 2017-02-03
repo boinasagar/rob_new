@@ -53,3 +53,9 @@ http://rob_fa.localhost/api/users_edit/10
 USers list:
 
 http://rob_fa.localhost/api/users_index.json
+
+
+Rewards Transfer: 
+http://rob_fa.localhost/api/transfer_rewards.json
+
+data[User][id]=45&data[User][rewards]=10&data[User][beneficiary_code]=4N5dqv

@@ -119,7 +119,7 @@ class AppController extends Controller {
         //$this->Auth->allow();
         // this line should always be there to ensure that all rest calls are secure
         //$this->Security->requireSecure();
-       $this->Security->unlockedActions = array('api_login', 'request_login', 'categories_view', 'categories_add', 'bills_add', 'users_add', 'users_edit', 'users_index', 'users_view' , 'verify_otp');  
+       $this->Security->unlockedActions = array('api_login', 'request_login', 'categories_view', 'categories_add', 'bills_add', 'users_add', 'users_edit', 'users_index', 'users_view' , 'verify_otp', 'transfer_rewards');  
               
 		}else{
 			// setup out Auth

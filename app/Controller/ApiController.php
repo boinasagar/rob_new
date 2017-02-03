@@ -11,7 +11,7 @@ App::uses('HttpSocket', 'Network/Http');
 class ApiController extends AppController {
 
 
-var $uses = array('Category','User','Outlet', 'Bill', 'UserDetail');
+var $uses = array('Category','User','Outlet', 'Bill', 'UserDetail', 'PromoCode', 'PromocodeCataegory', 'Reward');
 
 /**
  * Components
@@ -198,10 +198,9 @@ public function request_login(){
 					'message' => $message,
 					'_serialize' => array('message')
 				));				
-			}else{
-			
+			}else{			
 				$this->User->create();			
-				if ($this->User->save($User['User'])) {			
+				if ($this->User->save($User['User'])) {
 					
 					//otp generation
 					$string = '0123456789';
@@ -214,7 +213,7 @@ public function request_login(){
 					App::uses('HttpSocket', 'Network/Http');
 					$HttpSocket = new HttpSocket();
 					// string query
-					$results = $HttpSocket->get($otp_url);
+					//$results = $HttpSocket->get($otp_url);
 					//end -otp sent
 					
 					$id = $this->User->getLastInsertId();
@@ -222,6 +221,72 @@ public function request_login(){
 					$User['UserDetail']['otp'] = $otp_pwd;
 					$this->UserDetail->create();	
 					$this->UserDetail->save($User['UserDetail']);
+					
+					
+					//start - promo code generation
+					$promo_string = 'abcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ!#*_-';
+					$promo_string_shuffled = str_shuffle($promo_string);
+					$user_promo_code = substr($promo_string_shuffled, 1, 6);				
+					//end - promo code generation
+					$PromoCode['PromoCode']['user_id'] = $id;
+					$PromoCode['PromoCode']['promo_code'] = $user_promo_code;
+					$PromoCode['PromoCode']['promo_code_cat'] = 3;
+					
+					$this->PromoCode->save($PromoCode['PromoCode']);
+					
+					
+					//start - rewards for using promocode
+					if(isset($User['UserDetail']['promo_code']) && trim($User['UserDetail']['promo_code']) != ''){
+						$promo_code_details = $this->PromoCode->find('first', array(
+						'fields'=>array('PromoCode.*', 'PromoCat.*'),
+						'conditions'=>array('promo_code'=>$User['UserDetail']['promo_code']),
+						'joins' => array(
+							array(
+								'table' => 'promocode_cataegories',
+								'alias' => 'PromoCat',
+								'type' => 'LEFT',
+								'conditions' => array(
+									'AND' => array(
+										'PromoCat.id = PromoCode.promo_code_cat'				
+									)
+								)
+							)
+						)
+						));
+						
+						//print_r($promo_code_details);
+						
+						if(isset($promo_code_details['PromoCode'])){
+							$refferd_user = $promo_code_details['PromoCode']['user_id'];
+							$rewards = $promo_code_details['PromoCat']['rewards']/2;
+							
+							//to refferd user
+							$this->Reward->create();
+							$RefferedReward['Reward']['user_id'] = $refferd_user;
+							$RefferedReward['Reward']['rewards'] = $rewards;
+							$RefferedReward['Reward']['promo_code'] = $promo_code_details['PromoCode']['promo_code'];
+							$RefferedReward['Reward']['promo_code_cat'] = $promo_code_details['PromoCode']['promo_code_cat'];
+							$RefferedReward['Reward']['ref_user'] = $refferd_user;
+							$RefferedReward['Reward']['type'] = 'Promocode';
+							$RefferedReward['Reward']['notes'] = 'refferd user = '.$id;
+							
+							$this->Reward->save($RefferedReward['Reward']);
+							
+							//to registered user
+							$this->Reward->create();
+							$SignupReward['Reward']['user_id'] = $id;
+							$SignupReward['Reward']['rewards'] = $rewards;
+							$SignupReward['Reward']['promo_code'] = $promo_code_details['PromoCode']['promo_code'];
+							$SignupReward['Reward']['promo_code_cat'] = $promo_code_details['PromoCode']['promo_code_cat'];
+							$SignupReward['Reward']['ref_user'] = $refferd_user;
+							$SignupReward['Reward']['type'] = 'Promocode';
+							$SignupReward['Reward']['notes'] = 'signup user = '.$id;
+							
+							$this->Reward->save($SignupReward['Reward']);
+						}
+						
+					}
+					// end - rewards for using promocode
 					
 					$message = 'The user has been saved.';
 					$this->set(array(
@@ -289,7 +354,114 @@ public function request_login(){
 					'_serialize' => array('message')
 				));
 			}
+		}
 	}
+	
+	public function transfer_rewards(){
+		if ($this->request->is('post')) {
+			if (!$this->request->data['User']['id'] || !$this->request->data['User']['beneficiary_code'] || !$this->request->data['User']['rewards']) {
+				$message = 'Invalid Data. Please provide the requested data User unique promocode and number of rewards you want to transfer.';
+				$this->set(array(
+					'message' => $message,
+					'_serialize' => array('message')
+				));
+			}
+			if($this->request->data['User']['id'] && $this->request->data['User']['beneficiary_code'] && $this->request->data['User']['rewards']) {
+					$beneficiary_code = $this->request->data['User']['beneficiary_code'];
+					$benificiary_details = $this->PromoCode->find('first', array(
+						'fields'=>array('user_id'),
+						'conditions'=>array('promo_code'=>$beneficiary_code)
+						));
+						
+					if(!$benificiary_details['PromoCode']['user_id']){
+						$message = 'Invalid Beneficiary code';
+						$this->set(array(
+							'message' => $message,
+							'_serialize' => array('message')
+						));
+					}
+					
+					
+					//balance check
+					$user_id = $this->request->data['User']['id'];
+					$bal_query = "select SUM(rewards) as total_available_rewards from rewards WHERE user_id=$user_id";
+					$bal_result = $this->Reward->query($bal_query);
+					//print_r($bal_result);
+					$available_balance = $bal_result[0][0]['total_available_rewards'];
+					
+					if($available_balance < $this->request->data['User']['rewards']){
+						$message = 'Available balance is lower than requested. Please check your balance.';
+						$this->set(array(
+							'message' => $message,
+							'_serialize' => array('message')
+						));
+					}else{
+						//transfer rewards to beneficiary
+						$rewards = $this->request->data['User']['rewards'];
+						$this->Reward->create();
+						$TransferReward['Reward']['user_id'] = $user_id;
+						$TransferReward['Reward']['rewards'] = (int)($rewards*-1);
+						$TransferReward['Reward']['promo_code'] = '';
+						$TransferReward['Reward']['promo_code_cat'] = 4;
+						$TransferReward['Reward']['ref_user'] = $user_id;
+						$TransferReward['Reward']['type'] = 'Transfer';
+						$TransferReward['Reward']['notes'] = 'transfer to '.$benificiary_details['PromoCode']['user_id']. ' from '.$user_id;
+						//print_r($TransferReward);
+						if($this->Reward->save($TransferReward['Reward'])){			
+							$this->Reward->create();
+							$BeneficiaryReward['Reward']['user_id'] = $benificiary_details['PromoCode']['user_id'];
+							$BeneficiaryReward['Reward']['rewards'] = (int)($rewards*1);
+							$BeneficiaryReward['Reward']['promo_code'] = '';
+							$BeneficiaryReward['Reward']['promo_code_cat'] = 4;
+							$BeneficiaryReward['Reward']['ref_user'] = $user_id;
+							$BeneficiaryReward['Reward']['type'] = 'Transfer';
+							$BeneficiaryReward['Reward']['notes'] = 'transfer to '.$benificiary_details['PromoCode']['user_id']. ' from '.$user_id;
+							//print_r($BeneficiaryReward);
+							
+							if($this->Reward->save($BeneficiaryReward['Reward']))
+							{
+								$message = 'Rewards transfer successfully completed.';
+								$this->set(array(
+									'message' => $message,
+									'_serialize' => array('message')
+								));
+							}else{
+								
+								$rewards = $this->request->data['User']['rewards'];
+								$this->Reward->create();
+								$TransferReward['Reward']['user_id'] = $user_id;
+								$TransferReward['Reward']['rewards'] = (int)($rewards*1);
+								$TransferReward['Reward']['promo_code'] = '';
+								$TransferReward['Reward']['promo_code_cat'] = 4;
+								$TransferReward['Reward']['ref_user'] = $user_id;
+								$TransferReward['Reward']['type'] = 'Transfer';
+								$TransferReward['Reward']['notes'] = 'Reverting failed rewards transfer to '.$benificiary_details['PromoCode']['user_id']. ' from '.$user_id;
+								$this->Reward->save($TransferReward['Reward']);
+								
+								$message = 'Rewards transfer Failed.';
+								$this->set(array(
+									'message' => $message,
+									'_serialize' => array('message')
+								));
+							}
+						}else{
+							$message = 'Rewards transfer Failed.';
+							$this->set(array(
+								'message' => $message,
+								'_serialize' => array('message')
+							));
+						}
+					}
+					
+			
+			}else{
+				$message = 'Invalid Request.';
+				$this->set(array(
+					'message' => $message,
+					'_serialize' => array('message')
+				));
+			}
+		}
 	}
 	
 	

@@ -50,7 +50,13 @@ class UsersController extends AppController {
  public function login() {
 	    if ($this->request->is('post')) { 
 	        if ($this->Auth->login()) {
+				//check user status
+				if($_SESSION['Auth']['User']['status']){
  	            return $this->redirect($this->Auth->redirect('add'));
+				}else{
+					$this->Session->setFlash('Your account is inactive');
+					$this->redirect($this->Auth->logout());
+				}
  	        }
  	        $this->Session->setFlash(__('Your email or password was incorrect.'));
  	    }
