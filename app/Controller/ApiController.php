@@ -99,6 +99,19 @@ public function request_login(){
 		$this -> render('/Api/request_response');
 	}
 	
+	public function get_promocode_by_user($id){
+		if($id){
+			$promo = $this->PromoCode->find('first', array(
+					  'conditions'=>array('user_id'=>$id),
+					  'fields'=>array('promo_code')
+					));
+			return $promo['PromoCode']['promo_code'];	
+		
+		}else{
+			return '';
+		}
+	}
+	
 	public function api_login() {
 		if ($this->Auth->login()) {
 			$user = $this->Auth->user();
@@ -106,6 +119,7 @@ public function request_login(){
 			$token = JWT::encode($user, Configure::read('Security.salt'));
 			$this->Session->write('_token', $token);
 			//$user['token'] = $token;
+			$user['promo_code'] = $this->get_promocode_by_user($user['id']);
 			$this->set('user', $user);
 			$this->set('token', $token);
 			//pr($user);
@@ -171,7 +185,7 @@ public function request_login(){
 		
 	}
 	
-	public function users_add() {		
+	public function users_add() {
 		if ($this->request->is('post')) {			
 			foreach($this->request->data['User'] as $user_key => $user_val) {
 				
@@ -528,9 +542,56 @@ public function request_login(){
 		}
 	}
 	
+	public function outlets_index() {
+		$outlets = $this->Outlet->find('all', array('fields'=>array('Outlet.*', 'Category.*'),'joins' => array(
+			array(
+				'table' => 'categories',
+				'alias' => 'Category',
+				'type' => 'LEFT',
+				'conditions' => array(
+					'AND' => array(
+						'Outlet.category = Category.id'				
+					)
+				)
+			)
+		)));
+		
+		$this->set(array(
+            'outlets' => $outlets,
+            '_serialize' => array('outlets')
+        ));
+	}
+	
+	
+	public function outlets_view($id = null) {
+		
+		$options = array(
+						'conditions' => array('Outlet.' . $this->Outlet->primaryKey => $id),
+						'fields' => array('Outlet.*', 'Category.*'),
+						'joins' => array(
+							array(
+							'table' => 'categories',
+							'alias' => 'Category',
+							'type' => 'LEFT',
+							'conditions' => array(
+								'AND' => array(
+									'Outlet.category = Category.id'				
+								)
+							)
+							)
+						)
+					);
+		$outlet = $this->Outlet->find('first', $options);
+		
+		$this->set(array(
+            'outlet' => $outlet,
+            '_serialize' => array('outlet')
+        ));
+		
+	}
 	
 	public function bills_index() {
-		$categories = $this->Bill->find('all', array('fields'=>array('Bill.*', 'U.username'),'joins' => array(
+		$bills = $this->Bill->find('all', array('fields'=>array('Bill.*', 'U.username'),'joins' => array(
 			array(
 				'table' => 'users',
 				'alias' => 'U',
@@ -544,7 +605,7 @@ public function request_login(){
 		)));
 		
 		$this->set(array(
-            'bills' => $categories,
+            'bills' => $bills,
             '_serialize' => array('bills')
         ));
 	}

@@ -48,7 +48,7 @@ class OutletsController extends AppController {
 	public function add() {
 		if ($this->request->is('post')) {
 			$this->Outlet->create();
-			print_r($this->request->data);
+			//print_r($this->request->data);
 			$this->request->data['Outlet']['unique_id'] = '';
 							
 			$outlet_image = $this->request->data['Outlet']['image'];

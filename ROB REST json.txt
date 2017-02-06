@@ -50,7 +50,7 @@ http://rob_fa.localhost/api/users_edit/10
 {"User":{"id":"10", "username":"usertester5","first_name":"fname","last_name":"lname","mobile":"8239892333", "promo_code":"promo1234567890", "email":"test@test.com","password":"test123"}}
 
 
-USers list:
+Users list:
 
 http://rob_fa.localhost/api/users_index.json
 
@@ -59,3 +59,15 @@ Rewards Transfer:
 http://rob_fa.localhost/api/transfer_rewards.json
 
 data[User][id]=45&data[User][rewards]=10&data[User][beneficiary_code]=4N5dqv
+
+
+
+
+get Outlet list
+
+http://rob_fa.localhost/api/outlets_index.json
+
+get Outlet details
+
+http://rob_fa.localhost/api/outlets_view/2
+
