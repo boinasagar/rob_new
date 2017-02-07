@@ -13,7 +13,7 @@ class UsersController extends AppController {
  *
  * @var array
  */
-	var $components = array('Auth', 'Acl');
+	var $components = array('Auth', 'Acl', 'Paginator');
 	
 	
  public function beforeFilter() {
